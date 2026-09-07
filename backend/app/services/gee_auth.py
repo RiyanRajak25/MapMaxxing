@@ -37,8 +37,11 @@ def initialize_earth_engine() -> None:
         if not Path(config.GEE_SERVICE_ACCOUNT_KEY).exists():
             raise RuntimeError(
                 f"Service account key not found at {config.GEE_SERVICE_ACCOUNT_KEY}. "
-                "Fix the path in backend/.env, or clear the service account settings to fall "
-                "back to `earthengine authenticate`."
+                "On Render, add the JSON as a Secret File with this exact path: "
+                "/etc/secrets/gee-service-account.json, then set "
+                "GEE_SERVICE_ACCOUNT_KEY to that path. Locally, use "
+                "./secrets/gee-service-account.json or clear the service account settings "
+                "to fall back to `earthengine authenticate`."
             )
         credentials = ee.ServiceAccountCredentials(
             config.GEE_SERVICE_ACCOUNT_EMAIL, config.GEE_SERVICE_ACCOUNT_KEY
