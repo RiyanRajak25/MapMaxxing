@@ -137,6 +137,33 @@ npm run dev
 
 Open http://localhost:5173.
 
+### 4. Deploy to Render
+
+The repository includes [`render.yaml`](render.yaml), which defines separate
+Render services for the FastAPI backend and the Vite frontend. Create a new
+Blueprint from this repository, then set these values when Render prompts for
+the `sync: false` variables:
+
+**Backend service**
+
+- `GEE_PROJECT_ID`: your registered Earth Engine Google Cloud project ID.
+- `GEE_SERVICE_ACCOUNT_EMAIL`: the Earth Engine service account email.
+- `CORS_ORIGINS`: the deployed frontend URL, for example
+  `https://urban-change-frontend.onrender.com`.
+- Add a Render Secret File named `gee-service-account.json` containing the
+  service-account JSON key. The Blueprint points `GEE_SERVICE_ACCOUNT_KEY` to
+  `/etc/secrets/gee-service-account.json`.
+
+**Frontend service**
+
+- `VITE_API_BASE`: the deployed backend URL, for example
+  `https://urban-change-api.onrender.com`.
+
+Deploy the backend first, copy its public URL into `VITE_API_BASE`, and then
+deploy or redeploy the frontend. The backend start command binds to Render's
+injected `$PORT`, and the frontend publishes the generated `dist` directory.
+The backend health check is available at `/health`.
+
 ## Using it
 
 1. Click **Load example: Bhopal, India**, or draw your own area with the square or

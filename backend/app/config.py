@@ -8,7 +8,20 @@ GEE_PROJECT_ID = os.getenv("GEE_PROJECT_ID", "")
 GEE_SERVICE_ACCOUNT_EMAIL = os.getenv("GEE_SERVICE_ACCOUNT_EMAIL", "")
 GEE_SERVICE_ACCOUNT_KEY = os.getenv("GEE_SERVICE_ACCOUNT_KEY", "")
 
-CORS_ORIGINS = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")]
+
+
+def _origin_url(value: str) -> str:
+	value = value.strip().rstrip("/")
+	if value and not value.startswith(("http://", "https://")):
+		return f"https://{value}"
+	return value
+
+
+CORS_ORIGINS = [
+	_origin_url(origin)
+	for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+	if origin.strip()
+]
 
 DEFAULT_CLOUD_THRESHOLD = int(os.getenv("DEFAULT_CLOUD_THRESHOLD", "20"))
 
