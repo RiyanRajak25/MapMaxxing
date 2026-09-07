@@ -1,0 +1,9 @@
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}

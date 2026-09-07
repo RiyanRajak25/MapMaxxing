@@ -1,0 +1,967 @@
+:root {
+  /* Ground is a deep slate-teal rather than a neutral black: the map carries all
+     the colour in this tool, so the chrome stays desaturated and slightly cool
+     to keep the imagery legible above it. */
+  --bg: #0a1114;
+  --panel: #101a1e;
+  --panel-raised: #16242a;
+  --hairline: #22353c;
+  --hairline-strong: #2f4750;
+  --text: #e6ece9;
+  --text-dim: #8ba0a6;
+  --text-faint: #5d7178;
+
+  /* THE ACCENT SYSTEM IS THE MAP LEGEND.
+     No colour is invented here. Every one of these is a colour that already
+     means something on the map, so a swatch in the sidebar and a pixel on the
+     imagery always say the same thing. Amber is the earlier period and cyan the
+     later one, consistently, everywhere in the interface.
+     Keep in step with backend/app/services/change_detection.py. */
+  --before: #ffc300;
+  --after: #00e5ff;
+  --gain: #ff2d2d;
+  --instability: #9e9e9e;
+  --water: #1d7fe0;
+
+  /* Cyan is the "current state" colour, so it is also the interactive accent.
+     Dark ink on it for AA contrast on filled controls. */
+  --accent: var(--after);
+  --accent-ink: #04212a;
+
+  /* One radius scale. Controls and containers only; nothing is a pill. */
+  --r-panel: 8px;
+  --r-control: 6px;
+
+  --font: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every number in this interface is measured data, so numerals are monospaced
+   and tabular. Columns of figures line up and a digit changing between runs
+   does not reflow the row it sits in. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  height: 100dvh;
+}
+
+.sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--hairline);
+  overflow-y: auto;
+}
+
+/* ---- masthead ---- */
+
+.brand {
+  padding: 20px 22px 18px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.brand h1 {
+  margin: 0 0 5px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.brand p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+/* ---- sections ----
+   Hairline rules rather than nested boxes. At this density a stack of bordered
+   cards reads as clutter, and the rules already do the grouping work. */
+
+.panel {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.panel:last-child {
+  border-bottom: none;
+}
+
+.panel-title {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.panel-title:not(:first-child) {
+  margin-top: 22px;
+}
+
+/* ---- area of interest ---- */
+
+.aoi-status {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.aoi-status--set {
+  color: var(--text);
+}
+
+.preset-group {
+  display: grid;
+  gap: 7px;
+  margin-top: 11px;
+}
+
+/* ---- years ----
+   The two selectors are colour-coded to the map layers they produce, so the
+   reader never has to remember which period is which. */
+
+.year-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 10px;
+}
+
+.year-arrow {
+  padding-bottom: 9px;
+  color: var(--text-faint);
+  font-size: 13px;
+}
+
+.field {
+  display: block;
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 5px;
+}
+
+.field select,
+.field input[type='number'] {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-control);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+/* The left border carries the period colour: a 2px edge is enough to bind the
+   control to its layer without tinting the whole field. */
+.field--before select {
+  border-left: 2px solid var(--before);
+}
+
+.field--after select {
+  border-left: 2px solid var(--after);
+}
+
+.season-note {
+  margin: 9px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+select:focus-visible,
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hint {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-faint);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  margin-top: 14px;
+  cursor: pointer;
+}
+
+.checkbox input {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.slider-value {
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+/* ---- buttons ---- */
+
+.preset-button,
+.run-button {
+  width: 100%;
+  border-radius: var(--r-control);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease,
+    transform 0.06s ease;
+}
+
+.preset-button {
+  padding: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--hairline-strong);
+  font-size: 12.5px;
+}
+
+.preset-button:hover:not(:disabled) {
+  background: var(--panel-raised);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.run-button {
+  margin-top: 18px;
+  padding: 11px;
+  /* Dark ink on the cyan fill: contrast ratio well past AA. */
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.run-button:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.run-button:active:not(:disabled),
+.preset-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.run-button:disabled,
+.preset-button:disabled {
+  background: var(--hairline);
+  color: var(--text-faint);
+  border-color: var(--hairline);
+  cursor: not-allowed;
+}
+
+.export-area {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.export-button {
+  width: 100%;
+  display: block;
+  padding: 9px 10px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-control);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.export-button:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.export-button:disabled {
+  border-color: var(--hairline-strong);
+  color: var(--text-faint);
+  cursor: wait;
+}
+
+.export-hint {
+  margin-top: 8px;
+}
+
+/* ---- alert ---- */
+
+.alert {
+  margin: 0;
+  background: rgba(255, 90, 78, 0.08);
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  border-left: 2px solid #ff5a4e;
+  color: #ffb3a8;
+  padding: 13px 20px;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* ---- results headline ---- */
+
+.headline {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.headline-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--gain);
+}
+
+.headline-label {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.headline-sub {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- metric rows ---- */
+
+.stats {
+  margin: 0;
+  display: grid;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+}
+
+.stat + .stat {
+  border-top: 1px solid rgba(34, 53, 60, 0.6);
+}
+
+.stat dt {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.stat dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* A small colour chip binds the row to its map layer. */
+.stat-chip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 7px;
+  vertical-align: baseline;
+}
+
+.chip--before {
+  background: var(--before);
+}
+.chip--after {
+  background: var(--after);
+}
+.chip--gain {
+  background: var(--gain);
+}
+.chip--instability {
+  background: var(--instability);
+}
+
+.stat-value--gain {
+  color: var(--gain);
+}
+
+.stat-value--loss {
+  color: var(--instability);
+}
+
+/* ---- confidence block ----
+   The rejected share and the loss figure are the honest limits of the result,
+   so they get their own block rather than sitting in a footnote. */
+
+.confidence {
+  margin-top: 16px;
+  padding: 12px 13px;
+  background: var(--panel-raised);
+  border-radius: var(--r-panel);
+  border-left: 2px solid var(--instability);
+}
+
+.confidence-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.confidence-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.confidence-figure {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  color: var(--instability);
+}
+
+.confidence p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+.confidence p + p {
+  margin-top: 7px;
+}
+
+/* ---- shoreline profile (the signature) ----
+   A cross-section outward from the water's edge. Distance runs along x, growth
+   along y, with a zero baseline. Reading the shape left to right answers the
+   only question this analysis exists to ask: is development moving onto the
+   shoreline or away from it? */
+
+.profile {
+  margin: 2px 0 0;
+}
+
+.profile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Rendered inside the SVG so ticks land on the band boundaries exactly. */
+.profile-axis-tick {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--text-faint);
+}
+
+.profile-zero {
+  stroke: var(--hairline-strong);
+  stroke-width: 1;
+}
+
+.profile-step {
+  fill: none;
+  stroke: var(--gain);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.profile-fill {
+  fill: var(--gain);
+  opacity: 0.13;
+}
+
+.profile-water {
+  fill: var(--water);
+  opacity: 0.5;
+}
+
+.profile-tick {
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+
+.profile-value {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  fill: var(--text-dim);
+}
+
+/* Draws once when a result arrives. The sequence is the point: the eye follows
+   the line outward from the water and sees the gradient build. */
+@media (prefers-reduced-motion: no-preference) {
+  .profile-step {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .profile-fill {
+    opacity: 0;
+    animation: fade-in 0.7s 0.5s ease forwards;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 0.13;
+  }
+}
+
+.zone-rows {
+  margin-top: 14px;
+  display: grid;
+}
+
+.zone-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.zone-row + .zone-row {
+  border-top: 1px solid rgba(34, 53, 60, 0.6);
+}
+
+.zone-label {
+  color: var(--text-dim);
+}
+
+.zone-growth {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.zone-growth--up {
+  color: var(--gain);
+}
+
+.zone-growth--down {
+  color: var(--after);
+}
+
+.verdict {
+  margin: 14px 0 0;
+  padding: 11px 12px;
+  background: var(--panel-raised);
+  border-left: 2px solid var(--after);
+  border-radius: 0 var(--r-control) var(--r-control) 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+/* Growth concentrating on the shoreline is the encroachment case, and the only
+   result here that warrants an alarm colour. */
+.verdict--warn {
+  border-left-color: var(--gain);
+}
+
+/* ---- layer toggles ---- */
+
+.layer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.layer-item input {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ---- map ---- */
+
+.map-area {
+  position: relative;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+}
+
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(10, 17, 20, 0.74);
+  backdrop-filter: blur(3px);
+  font-size: 13.5px;
+  text-align: center;
+  padding: 24px;
+}
+
+.map-overlay p {
+  margin: 0;
+  max-width: 34ch;
+  line-height: 1.55;
+}
+
+.map-empty {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 900;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  background: rgba(16, 26, 30, 0.95);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-panel);
+  font-size: 12.5px;
+  color: var(--text-dim);
+  max-width: calc(100% - 32px);
+}
+
+.map-empty strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Zoom guidance: change is measured per 10 m pixel, which is smaller than one
+   screen pixel below about zoom 14. Without this the map looks empty and the
+   reader concludes the analysis found nothing. */
+.map-scale-note {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 900;
+  pointer-events: none;
+  padding: 7px 11px;
+  background: rgba(16, 26, 30, 0.95);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.overlay-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.overlay-lead {
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* Wider than the lead above it, and the height is reserved for two lines: the
+   stages differ in length, and without this the longest one wraps and shunts
+   the clock down mid-run. Scoped to out-specify `.map-overlay p`. */
+.map-overlay .overlay-phase {
+  max-width: 42ch;
+  min-height: 3.1em;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.overlay-elapsed {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* Tiles keep arriving after the request returns, and start over on every pan,
+   so this reports quietly from the top of the map instead of blocking it. */
+.tile-status {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 12px 6px 7px;
+  background: rgba(16, 26, 30, 0.95);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-panel);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ---- earth loader ---- */
+
+/* Both waits in this tool are Earth Engine waits, and both get this globe: the
+   analysis request, and the tiles rendering on demand afterwards.
+   Everything inside is sized in `em`, so one font-size scales the whole thing -
+   the 7.5em width below is the divisor EarthLoader.jsx uses to turn a pixel
+   diameter into that font-size. Change one and change the other. */
+.earth-loader {
+  /* The ocean is the map's own water colour, so the globe belongs to the same
+     legend as every other blue on screen. */
+  --watercolor: var(--water);
+  --landcolor: #7cc133;
+
+  position: relative;
+  flex-shrink: 0;
+  width: 7.5em;
+  height: 7.5em;
+  overflow: hidden;
+  border: solid 0.15em rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  background-color: var(--watercolor);
+  /* Lit from above. A highlight along the top edge and shade along the bottom
+     is what stops a flat circle reading as a disc. */
+  box-shadow:
+    inset 0 0.5em rgb(255 255 255 / 0.25),
+    inset 0 -0.5em rgb(0 0 0 / 0.25);
+  animation: earth-start 1s 1;
+}
+
+.earth-loader path {
+  fill: var(--landcolor);
+}
+
+.earth-loader svg {
+  position: absolute;
+  width: 7em;
+  height: auto;
+}
+
+/* Four landmasses at staggered offsets and delays, so the face reads as
+   continents drifting past rather than one shape going round. */
+.earth-loader svg:nth-child(1) {
+  bottom: -2em;
+  animation: earth-drift-near 5s infinite linear 0.75s;
+}
+
+.earth-loader svg:nth-child(2) {
+  top: -3em;
+  animation: earth-drift-near 5s infinite linear;
+}
+
+.earth-loader svg:nth-child(3) {
+  top: -2.5em;
+  animation: earth-drift-far 5s infinite linear;
+}
+
+.earth-loader svg:nth-child(4) {
+  bottom: -2.2em;
+  animation: earth-drift-far 5s infinite linear 0.75s;
+}
+
+/* The pill appears and disappears on every pan, so it skips the power-on
+   flash - at this size a repeating flash is a flicker, not an entrance. */
+.tile-status .earth-loader {
+  animation: none;
+}
+
+@keyframes earth-start {
+  0%,
+  75% {
+    filter: brightness(500%);
+    box-shadow: none;
+  }
+  100% {
+    filter: brightness(100%);
+    box-shadow:
+      inset 0 0.5em rgb(255 255 255 / 0.25),
+      inset 0 -0.5em rgb(0 0 0 / 0.25);
+  }
+}
+
+/* A landmass crosses the face, vanishes at the limb, and reappears on the far
+   side. The skew and rotate are the curvature - a shape sliding flat across a
+   circle reads as a sticker rather than a surface. */
+@keyframes earth-drift-near {
+  0% {
+    left: -2em;
+    opacity: 100%;
+    transform: skewX(0deg) rotate(0deg);
+  }
+  30% {
+    left: -6em;
+    opacity: 100%;
+    transform: skewX(-25deg) rotate(25deg);
+  }
+  31% {
+    left: -6em;
+    opacity: 0%;
+    transform: skewX(-25deg) rotate(25deg);
+  }
+  35% {
+    left: 7em;
+    opacity: 0%;
+    transform: skewX(25deg) rotate(-25deg);
+  }
+  45% {
+    left: 7em;
+    opacity: 100%;
+    transform: skewX(25deg) rotate(-25deg);
+  }
+  100% {
+    left: -2em;
+    opacity: 100%;
+    transform: skewX(0deg) rotate(0deg);
+  }
+}
+
+@keyframes earth-drift-far {
+  0% {
+    left: 5em;
+    opacity: 100%;
+    transform: skewX(0deg) rotate(0deg);
+  }
+  75% {
+    left: -7em;
+    opacity: 100%;
+    transform: skewX(-25deg) rotate(25deg);
+  }
+  76% {
+    left: -7em;
+    opacity: 0%;
+    transform: skewX(-25deg) rotate(25deg);
+  }
+  77% {
+    left: 8em;
+    opacity: 0%;
+    transform: skewX(25deg) rotate(-25deg);
+  }
+  80% {
+    left: 8em;
+    opacity: 100%;
+    transform: skewX(25deg) rotate(-25deg);
+  }
+  100% {
+    left: 5em;
+    opacity: 100%;
+    transform: skewX(0deg) rotate(0deg);
+  }
+}
+
+/* Results arriving is a state change worth marking, so the panel settles in
+   rather than snapping. Nothing else on the page moves on its own. */
+@media (prefers-reduced-motion: no-preference) {
+  .results-enter,
+  /* Same settle, for the same reason: a stage caption replacing another is a
+     state change, and swapping the words in place looks like a glitch. */
+  .overlay-phase {
+    animation: settle 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The globe stays, because something has to say the server is still working,
+     but both of its aggressive parts go: the power-on flash is a brightness
+     jump, and the drift is large-area motion across most of the shape. Slowing
+     the continents to a crawl keeps it alive without the sweep. */
+  .earth-loader {
+    animation: none;
+  }
+  /* :nth-child(n) matches all four and, unlike a bare `svg`, carries the same
+     specificity as the :nth-child(1..4) rules that set the 5s duration - a
+     media query adds none of its own, so without this the override loses. */
+  .earth-loader svg:nth-child(n) {
+    animation-duration: 20s;
+  }
+  .preset-button,
+  .run-button {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 60dvh;
+    height: auto;
+  }
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--hairline);
+  }
+}
