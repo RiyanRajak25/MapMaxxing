@@ -2,10 +2,10 @@ import axios from 'axios'
 
 const configuredApiBase = import.meta.env.VITE_API_BASE
 const API_BASE = configuredApiBase
-  ? /^https?:\/\//.test(configuredApiBase)
-    ? configuredApiBase.replace(/\/$/, '')
-    : `https://${configuredApiBase}`
-  : 'http://localhost:8000'
+  ? (/^https?:\/\//.test(configuredApiBase) ? configuredApiBase : `https://${configuredApiBase}`).replace(/\/$/, '')
+  : import.meta.env.DEV
+    ? 'http://localhost:8000'
+    : ''
 const EXPORT_TIMEOUT_MS = 180000
 
 const client = axios.create({
@@ -21,6 +21,7 @@ export async function runChangeDetection({
   includeWetland,
 }) {
   try {
+    if (!API_BASE) throw new Error('VITE_API_BASE is not configured for this deployment.')
     // Periods are years, not date ranges. The backend expands each to the
     // post-monsoon dry season starting in that year, so the two composites
     // always sample the same phenology.
@@ -38,6 +39,7 @@ export async function runChangeDetection({
 }
 
 export async function downloadShapefile(exportUrls, onStatus) {
+  if (!API_BASE) throw new Error('VITE_API_BASE is not configured for this deployment.')
   const { data: job } = await client.post('/api/export-shapefile', { export_urls: exportUrls })
   let status = job
   const startedAt = Date.now()
